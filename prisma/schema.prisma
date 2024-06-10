@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum categories {
+  involvement
+  loyalty
+}
+
+model account {
+  id String @id @default(uuid())
+  login String
+  password String
+}
+
+model organization {
+  id String @id @default(uuid())
+  name String
+  is_active Boolean
+  member member[]
+}
+
+model member { 
+  id String @id @default(uuid())
+  email String
+  name String
+  link String
+
+  organization organization @relation(fields: [organization_id], references: [id])
+  organization_id String
+
+  comment comment[]
+  answer answer[]
+}
+
+model comment {
+  id String @id @default(uuid())
+  value String
+  
+  member member @relation(fields: [member_id], references: [id])
+  member_id String
+}
+
+model answer {
+  @@id([member_id, question_iq])
+  value Int
+
+  member member @relation(fields: [member_id], references: [id])
+  member_id String
+
+  question question @relation(fields: [question_iq], references: [id])
+  question_iq String
+
+}
+
+model question{
+  id String @id @default(uuid())
+  category categories
+
+  answer answer[]
+}
